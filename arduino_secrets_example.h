@@ -1,0 +1,3 @@
+#define SECRET_SSID "mySSID"
+#define SECRET_PASS "mySSIDPassword"
+#define SECRET_MQTT_SERVER "192.168.0.100"
