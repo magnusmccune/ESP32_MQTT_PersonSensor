@@ -18,8 +18,8 @@ EspMQTTClient client(
   mqtt_port                // The MQTT port, default to 1883. this line can be omitted
 );
 
-const int32_t SAMPLE_DELAY_MS = 1500;
-StaticJsonDocument<256> doc;
+const int32_t SAMPLE_DELAY_MS = 1000;
+StaticJsonDocument<512> doc;
 person_sensor_results_t oldResult ={};
 
 void setup() {
@@ -27,7 +27,7 @@ void setup() {
   Serial.begin(9600);
 
   client.enableLastWillMessage("esp32/state", "offline", true);
-  client.setMaxPacketSize(256);
+  client.setMaxPacketSize(512);
 }
 
 void onConnectionEstablished(){
@@ -60,7 +60,7 @@ void loop() {
   client.loop();
   person_sensor_results_t results = {};
   JsonObject object = doc.to<JsonObject>();
-  char buffer[256];
+  char buffer[512];
 
   if (!person_sensor_read(&results)) {
     Serial.println("No person sensor results found on the i2c bus");
@@ -70,6 +70,8 @@ void loop() {
  if (! personDataAreTheSame(oldResult, results)){
     oldResult = results;
     Serial.println("********************");
+    String num_faces_string = String(results.num_faces);
+    client.publish("esp32/insight", num_faces_string);
   
     object["faces"] = results.num_faces;
   
